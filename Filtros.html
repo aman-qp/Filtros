@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtros</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #6b1c87 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #6b1c87;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab.active {
+            background: #6b1c87;
+            color: white;
+        }
+
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #6b1c87;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #6b1c87;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #561470;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .vehicle-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #6b1c87;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .vehicle-card:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .vehicle-card h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .vehicle-card p {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .filter-info {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .filter-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .filter-item:last-child {
+            border-bottom: none;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .filter-value {
+            color: #2d3748;
+            text-align: right;
+            max-width: 60%;
+            word-wrap: break-word;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #2d3748;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #718096;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn {
+            background: #e53e3e;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .delete-btn:hover {
+            background: #c53030;
+        }
+
+        .edit-btn {
+            background: #6b1c87;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .edit-btn:hover {
+            background: #561470;
+        }
+
+        .modal-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #6b1c87 0%, #1a1a1a 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #6b1c87;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background: #bee3f8;
+            color: #2c5282;
+            border: 1px solid #90cdf4;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .sync-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .sync-dot {
+            width: 12px;
+            height: 12px;
+            background: #38a169;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .sync-dot.error {
+            background: #e53e3e;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 600px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+
+            .filter-item {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .filter-value {
+                max-width: 100%;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧Administrador de filtros</h1>
+            <input type="text" id="searchInput" class="search-bar" placeholder="Buscar por marca, modelo o año...">
+            <div class="sync-status" id="syncStatus" style="display: none;">
+                <div class="sync-dot" id="syncDot"></div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('list')">Lista</button>
+            <button class="tab" onclick="switchTab('add')">+ Agregar</button>
+        </div>
+
+        <div class="content">
+            <!-- Vista de Listado -->
+            <div id="listView">
+                <div id="loadingState" class="loading">
+                    <div class="spinner"></div>
+                    <p>Cargando vehículos...</p>
+                </div>
+                <div id="contentArea" style="display: none;">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalVehicles">0</div>
+                            <div class="stat-label">Carros</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalBrands">0</div>
+                            <div class="stat-label">Marcas</div>
+                        </div>
+                    </div>
+                    <div id="vehiclesList"></div>
+                </div>
+            </div>
+
+            <!-- Vista de Agregar -->
+            <div id="addView" style="display: none;">
+                <h2 id="formTitle" style="margin-bottom: 20px; color: #2d3748;">Agregar Nuevo Carro</h2>
+                <div id="formAlert" style="display: none;"></div>
+                <form id="vehicleForm">
+                    <div class="form-group">
+                        <label for="brand">Marca *</label>
+                        <input type="text" id="brand" required placeholder="Ej: Hyundai">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="model">Modelo *</label>
+                        <input type="text" id="model" required placeholder="Ej: Tucson">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="year">Año *</label>
+                        <input type="number" id="year" required placeholder="Ej: 2025" min="1950" max="2030">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="engine">Motor</label>
+                        <input type="text" id="engine" placeholder="Ej: 2.5L 4 cilindros">
+                    </div>
+
+                    <h3 style="margin: 25px 0 15px; color: #2d3748;">Filtros y Especificaciones</h3>
+
+                    <div class="form-group">
+                        <label for="oilFilter">Filtro de Aceite</label>
+                        <input type="text" id="oilFilter" placeholder="Ej: Mann W712/75">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="oilType">Tipo de Aceite</label>
+                        <input type="text" id="oilType" placeholder="Ej: 5W-30 sintético">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="oilCapacity">Capacidad de Aceite</label>
+                        <input type="text" id="oilCapacity" placeholder="Ej: 5.0 litros">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="airFilter">Filtro de Aire</label>
+                        <input type="text" id="airFilter" placeholder="Ej: Mann C27009">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fuelFilter">Filtro de Combustible</label>
+                        <input type="text" id="fuelFilter" placeholder="Ej: Mann WK853/3">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cabinFilter">Filtro de Cabina</label>
+                        <input type="text" id="cabinFilter" placeholder="Ej: Mann CU22011">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notas Adicionales</label>
+                        <textarea id="notes" placeholder="Cualquier información adicional importante..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn" id="submitBtn">Guardar Carro</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalles -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script>
+        // Variables globales
+        let editingVehicleId = null;
+        let vehicles = [];
+    </script>
+
+    <script type="module">
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdu7YLZFKAV_zptyIAyyXjVCxN4InD4ZU",
+            authDomain: "prueba-c0003.firebaseapp.com",
+            projectId: "prueba-c0003",
+            storageBucket: "prueba-c0003.firebasestorage.app",
+            messagingSenderId: "640321776105",
+            appId: "1:640321776105:web:128f1281802e593f110378"
+        };
+
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Inicializar Firebase
+        let app, db;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            console.log('Firebase conectado correctamente');
+            loadVehicles();
+        } catch (error) {
+            console.error('Error al conectar con Firebase:', error);
+            showError('Error de configuración. Por favor verifica las credenciales de Firebase.');
+            document.getElementById('syncDot').classList.add('error');
+            document.getElementById('syncStatus').style.display = 'inline-flex';
+        }
+
+        // Cargar vehículos desde Firebase
+        async function loadVehicles() {
+            try {
+                const q = query(collection(db, 'vehicles'), orderBy('brand'));
+                const querySnapshot = await getDocs(q);
+                
+                vehicles = [];
+                querySnapshot.forEach((doc) => {
+                    vehicles.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+
+                console.log(`${vehicles.length} vehículos cargados`);
+                
+                // Ocultar loading y mostrar contenido
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('contentArea').style.display = 'block';
+                document.getElementById('syncStatus').style.display = 'inline-flex';
+                
+                renderVehicles();
+            } catch (error) {
+                console.error('Error al cargar vehículos:', error);
+                showError('Error al cargar los datos. Verifica tu conexión.');
+                document.getElementById('syncDot').classList.add('error');
+                document.getElementById('syncStatus').style.display = 'inline-flex';
+            }
+        }
+
+        // Guardar o actualizar vehículo en Firebase
+        window.saveVehicle = async function(vehicleData) {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            
+            const isEditing = editingVehicleId !== null;
+            submitBtn.textContent = isEditing ? 'Actualizando...' : 'Guardando...';
+
+            try {
+                if (isEditing) {
+                    // Actualizar vehículo existente
+                    await updateDoc(doc(db, 'vehicles', editingVehicleId), vehicleData);
+                    console.log('Vehículo actualizado con ID:', editingVehicleId);
+                    
+                    // Actualizar en la lista local
+                    const index = vehicles.findIndex(v => v.id === editingVehicleId);
+                    if (index !== -1) {
+                        vehicles[index] = { id: editingVehicleId, ...vehicleData };
+                    }
+                    
+                    showFormAlert('Vehículo actualizado exitosamente en la nube', 'success');
+                    editingVehicleId = null; // Resetear modo edición
+                } else {
+                    // Crear nuevo vehículo
+                    const docRef = await addDoc(collection(db, 'vehicles'), vehicleData);
+                    console.log('Vehículo guardado con ID:', docRef.id);
+                    
+                    // Agregar a la lista local
+                    vehicles.push({
+                        id: docRef.id,
+                        ...vehicleData
+                    });
+                    
+                    showFormAlert('Vehículo guardado exitosamente en la nube', 'success');
+                }
+
+                // Limpiar formulario
+                document.getElementById('vehicleForm').reset();
+                document.getElementById('formTitle').textContent = 'Agregar Nuevo Carro';
+                
+                // Cambiar a vista de listado después de 1 segundo
+                setTimeout(() => {
+                    document.querySelectorAll('.tab')[0].click();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                showFormAlert('Error al guardar. Verifica tu conexión.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = isEditing ? 'Actualizar Carro' : 'Guardar Carro';
+            }
+        };
+
+        // Eliminar vehículo
+        window.deleteVehicle = async function(id) {
+            if (!confirm('¿Estás seguro de eliminar este carro?')) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'vehicles', id));
+                vehicles = vehicles.filter(v => v.id !== id);
+                closeModal();
+                renderVehicles();
+                console.log('Carro eliminado');
+            } catch (error) {
+                console.error('Error al eliminar:', error);
+                alert('Error al eliminar. Verifica tu conexión.');
+                document.getElementById('syncDot').classList.add('error');
+            }
+        };
+
+        // Editar vehículo
+        window.editVehicle = function(id) {
+            const vehicle = vehicles.find(v => v.id === id);
+            if (!vehicle) return;
+
+            // Establecer modo edición
+            editingVehicleId = id;
+
+            // Llenar el formulario con los datos del vehículo
+            document.getElementById('brand').value = vehicle.brand || '';
+            document.getElementById('model').value = vehicle.model || '';
+            document.getElementById('year').value = vehicle.year || '';
+            document.getElementById('engine').value = vehicle.engine || '';
+            document.getElementById('oilFilter').value = vehicle.oilFilter || '';
+            document.getElementById('oilType').value = vehicle.oilType || '';
+            document.getElementById('oilCapacity').value = vehicle.oilCapacity || '';
+            document.getElementById('airFilter').value = vehicle.airFilter || '';
+            document.getElementById('fuelFilter').value = vehicle.fuelFilter || '';
+            document.getElementById('cabinFilter').value = vehicle.cabinFilter || '';
+            document.getElementById('notes').value = vehicle.notes || '';
+
+            // Cambiar el título y botón del formulario
+            document.getElementById('formTitle').textContent = 'Editar Carro';
+            document.getElementById('submitBtn').textContent = 'Actualizar Carro';
+
+            // Cerrar modal y cambiar a vista de formulario
+            closeModal();
+            document.querySelectorAll('.tab')[1].click();
+        };
+
+        // Funciones de UI
+        function showError(message) {
+            document.getElementById('loadingState').innerHTML = `
+                <div class="alert alert-error">
+                    ${message}
+                </div>
+                <p style="margin-top: 20px; color: #718096;">
+                    Asegúrate de haber configurado correctamente Firebase en el código.
+                </p>
+            `;
+            document.getElementById('syncDot').classList.add('error');
+            document.getElementById('syncStatus').style.display = 'inline-flex';
+        }
+
+        function showFormAlert(message, type) {
+            const alertDiv = document.getElementById('formAlert');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 4000);
+        }
+
+        window.renderVehicles = function(filter = '') {
+            const list = document.getElementById('vehiclesList');
+            const searchTerm = filter.toLowerCase();
+
+            const filtered = vehicles.filter(v => 
+                v.brand.toLowerCase().includes(searchTerm) ||
+                v.model.toLowerCase().includes(searchTerm) ||
+                v.year.toString().includes(searchTerm)
+            );
+
+            // Actualizar estadísticas
+            document.getElementById('totalVehicles').textContent = vehicles.length;
+            const uniqueBrands = new Set(vehicles.map(v => v.brand.toLowerCase()));
+            document.getElementById('totalBrands').textContent = uniqueBrands.size;
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <h3 style="margin-bottom: 10px;">No hay carros guardados</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            // Ordenar por marca y modelo
+            filtered.sort((a, b) => {
+                const brandCompare = a.brand.localeCompare(b.brand);
+                if (brandCompare !== 0) return brandCompare;
+                return a.model.localeCompare(b.model);
+            });
+
+            list.innerHTML = filtered.map(vehicle => `
+                <div class="vehicle-card" onclick="showDetails('${vehicle.id}')">
+                    <h3>${vehicle.brand} ${vehicle.model} ${vehicle.year}</h3>
+                    <p><strong>Motor:</strong> ${vehicle.engine || 'No especificado'}</p>
+                    <p><strong>Filtro de Aceite:</strong> ${vehicle.oilFilter || 'No especificado'}</p>
+                    <p><strong>Aceite:</strong> ${vehicle.oilType || 'No especificado'}</p>
+                </div>
+            `).join('');
+        };
+
+        window.showDetails = function(id) {
+            const vehicle = vehicles.find(v => v.id === id);
+            if (!vehicle) return;
+
+            document.getElementById('modalTitle').textContent = 
+                `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
+
+            const details = [];
+
+            if (vehicle.engine) {
+                details.push({ label: 'Motor', value: vehicle.engine });
+            }
+            if (vehicle.oilFilter) {
+                details.push({ label: 'Filtro de Aceite', value: vehicle.oilFilter });
+            }
+            if (vehicle.oilType) {
+                details.push({ label: 'Tipo de Aceite', value: vehicle.oilType });
+            }
+            if (vehicle.oilCapacity) {
+                details.push({ label: 'Capacidad de Aceite', value: vehicle.oilCapacity });
+            }
+            if (vehicle.airFilter) {
+                details.push({ label: 'Filtro de Aire', value: vehicle.airFilter });
+            }
+            if (vehicle.fuelFilter) {
+                details.push({ label: 'Filtro de Combustible', value: vehicle.fuelFilter });
+            }
+            if (vehicle.cabinFilter) {
+                details.push({ label: 'Filtro de Cabina', value: vehicle.cabinFilter });
+            }
+
+            let html = '<div class="filter-info">';
+            details.forEach(detail => {
+                html += `
+                    <div class="filter-item">
+                        <span class="filter-label">${detail.label}:</span>
+                        <span class="filter-value">${detail.value}</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            if (vehicle.notes) {
+                html += `
+                    <div style="margin-top: 15px; padding: 12px; background: #fff5e6; border-radius: 6px;">
+                        <strong style="color: #2d3748;">Notas:</strong>
+                        <p style="margin-top: 8px; color: #4a5568;">${vehicle.notes}</p>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="modal-buttons">
+                    <button class="edit-btn" onclick="editVehicle('${vehicle.id}')">Editar</button>
+                    <button class="delete-btn" onclick="deleteVehicle('${vehicle.id}')">Eliminar</button>
+                </div>
+            `;
+
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('detailModal').classList.add('active');
+        };
+
+    </script>
+
+    <script>
+        // Funciones globales de UI
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tab === 'list') {
+                document.getElementById('listView').style.display = 'block';
+                document.getElementById('addView').style.display = 'none';
+                renderVehicles();
+            } else {
+                // Resetear modo edición si no venimos de editVehicle
+                if (editingVehicleId === null) {
+                    document.getElementById('vehicleForm').reset();
+                    document.getElementById('formTitle').textContent = 'Agregar Nuevo Carro';
+                    document.getElementById('submitBtn').textContent = 'Guardar Carro';
+                }
+                document.getElementById('listView').style.display = 'none';
+                document.getElementById('addView').style.display = 'block';
+            }
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const vehicle = {
+                brand: document.getElementById('brand').value.trim(),
+                model: document.getElementById('model').value.trim(),
+                year: parseInt(document.getElementById('year').value),
+                engine: document.getElementById('engine').value.trim(),
+                oilFilter: document.getElementById('oilFilter').value.trim(),
+                oilType: document.getElementById('oilType').value.trim(),
+                oilCapacity: document.getElementById('oilCapacity').value.trim(),
+                airFilter: document.getElementById('airFilter').value.trim(),
+                fuelFilter: document.getElementById('fuelFilter').value.trim(),
+                cabinFilter: document.getElementById('cabinFilter').value.trim(),
+                notes: document.getElementById('notes').value.trim(),
+                createdAt: new Date().toISOString()
+            };
+
+            saveVehicle(vehicle);
+        });
+
+        // Búsqueda
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            renderVehicles(e.target.value);
+        });
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
